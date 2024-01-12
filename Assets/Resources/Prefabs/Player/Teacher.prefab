@@ -43,6 +43,7 @@ GameObject:
   - component: {fileID: 2325567975551813439}
   - component: {fileID: 2828563290013937284}
   - component: {fileID: 9058261572049124318}
+  - component: {fileID: 5683033121476533943}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -145,6 +146,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.1, y: 0.1, z: 0.6}
   m_Center: {x: 0, y: 0, z: 0.75}
+--- !u!114 &5683033121476533943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078138026303682304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 728a57b9e6054ee09657732135859862, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3786641456220239112
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,6 +374,7 @@ MonoBehaviour:
   shootPoint: {fileID: 5572817905919865827}
   orientation: {fileID: 3495954572839540977}
   bullet: {fileID: 4324326621529309522, guid: 854e7021445d2204dbd630e616412c39, type: 3}
+  BulletSpeed: 0
   PlayerTyp: 0
   PlayerCameraController: {fileID: 1794068503293648871}
 --- !u!114 &544806972732414975
