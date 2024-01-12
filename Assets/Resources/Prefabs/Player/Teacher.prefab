@@ -371,8 +371,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 100
   maxHealth: 100
-  shootPoint: {fileID: 5572817905919865827}
-  orientation: {fileID: 3495954572839540977}
+  shootPoint: {fileID: 3495954572839540977}
+  orientation: {fileID: 5572817905919865827}
   bullet: {fileID: 4324326621529309522, guid: 854e7021445d2204dbd630e616412c39, type: 3}
   BulletSpeed: 0
   PlayerTyp: 0
