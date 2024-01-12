@@ -60,7 +60,7 @@ Transform:
   m_GameObject: {fileID: 2078138026303682304}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.509, z: 0}
+  m_LocalPosition: {x: 0, y: 0.509, z: 0.201}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -144,8 +144,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.1, y: 0.1, z: 0.6}
-  m_Center: {x: 0, y: 0, z: 0.75}
+  m_Size: {x: 0.2, y: 0.2, z: 0.81953406}
+  m_Center: {x: 0, y: 0, z: 0.6402329}
 --- !u!114 &5683033121476533943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,8 +197,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4211104131874152416}
-  - {fileID: 5572817905919865827}
   - {fileID: 3495954572839540977}
+  - {fileID: 5572817905919865827}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2118788579171969645
@@ -374,7 +374,7 @@ MonoBehaviour:
   shootPoint: {fileID: 3495954572839540977}
   orientation: {fileID: 5572817905919865827}
   bullet: {fileID: 4324326621529309522, guid: 854e7021445d2204dbd630e616412c39, type: 3}
-  BulletSpeed: 0
+  BulletSpeed: 100
   PlayerTyp: 0
   PlayerCameraController: {fileID: 1794068503293648871}
 --- !u!114 &544806972732414975
@@ -440,8 +440,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4656002559497481520}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.637}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.6370001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

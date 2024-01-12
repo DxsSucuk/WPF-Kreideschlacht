@@ -1,5 +1,4 @@
-﻿using System;
-using Photon.Pun;
+﻿using Photon.Pun;
 using UnityEngine;
 
 public class Pickupable : MonoBehaviourPun
@@ -9,6 +8,7 @@ public class Pickupable : MonoBehaviourPun
     public bool interactable, pickedup;
     private Rigidbody objRigidbody;
     public float throwAmount;
+    public PlayerController controller;
 
     private void Awake()
     {
@@ -22,6 +22,8 @@ public class Pickupable : MonoBehaviourPun
             crosshair1.SetActive(false);
             crosshair2.SetActive(true);
             interactable = true;
+            cameraTrans = other.transform;
+            controller = cameraTrans.parent.GetComponent<PlayerController>();
         }
     }
 
@@ -37,12 +39,8 @@ public class Pickupable : MonoBehaviourPun
             }
             else
             {
-                transform.parent = null;
-                objRigidbody.useGravity = true;
                 crosshair1.SetActive(true);
                 crosshair2.SetActive(false);
-                interactable = false;
-                pickedup = false;
             }
         }
     }
@@ -51,32 +49,37 @@ public class Pickupable : MonoBehaviourPun
     {
         if (interactable)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetKeyDown(KeyCode.E))
             {
-                photonView.RPC(nameof(Pickup), RpcTarget.All);
+                //Pickup();
+                photonView.RPC(nameof(Pickup), RpcTarget.All, controller.photonView.ViewID);
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetKeyUp(KeyCode.E))
             {
-                photonView.RPC(nameof(Drop), RpcTarget.All);
+                //Drop();
+                photonView.RPC(nameof(Drop), RpcTarget.All/*, controller.photonView.ViewID*/);
             }
-
-            if (pickedup)
+        }
+        
+        if (pickedup)
+        {
+            if (Input.GetMouseButtonDown(1))
             {
-                if (Input.GetMouseButtonDown(1))
-                {
-                    photonView.RPC(nameof(Throw), RpcTarget.All);
-                }
+                //Throw();
+                photonView.RPC(nameof(Throw), RpcTarget.All, controller.photonView.ViewID);
             }
         }
     }
-
+    
     [PunRPC]
-    void Pickup()
+    void Pickup(int viewId)
     {
-        transform.parent = cameraTrans;
+        transform.parent = PhotonNetwork.GetPhotonView(viewId).transform.GetChild(0).transform;
         objRigidbody.useGravity = false;
         pickedup = true;
+        interactable = false;
+        objRigidbody.constraints = RigidbodyConstraints.FreezeAll;
     }
     
     [PunRPC]
@@ -85,14 +88,16 @@ public class Pickupable : MonoBehaviourPun
         transform.parent = null;
         objRigidbody.useGravity = true;
         pickedup = false;
+        objRigidbody.constraints = RigidbodyConstraints.None;
     }
 
     [PunRPC]
-    void Throw()
+    void Throw(int viewId)
     {
         transform.parent = null;
         objRigidbody.useGravity = true;
-        objRigidbody.velocity = cameraTrans.forward * throwAmount * Time.deltaTime;
+        objRigidbody.constraints = RigidbodyConstraints.None;
         pickedup = false;
+        objRigidbody.velocity = PhotonNetwork.GetPhotonView(viewId).transform.GetChild(0).transform.forward * throwAmount * Time.deltaTime;
     }
 }

@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
             Vector3 direction = targetPoint - shootPoint.position;
 
-            Debug.DrawRay(shootPoint.position, direction, Color.red);
+            Debug.DrawRay(shootPoint.position, direction, Color.red, 5);
 
             GameObject bulletObject = PhotonNetwork.Instantiate("Prefabs/Projectile/" + bullet.name,
                 shootPoint.position, Quaternion.identity);
