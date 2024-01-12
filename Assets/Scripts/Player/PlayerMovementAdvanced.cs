@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using TMPro;
 
-public class PlayerMovementAdvanced : MonoBehaviour
+public class PlayerMovementAdvanced : MonoBehaviourPun
 {
     [Header("Movement")]
     private float moveSpeed;
@@ -85,6 +86,8 @@ public class PlayerMovementAdvanced : MonoBehaviour
 
     private void Update()
     {
+        if (!photonView.IsMine) return;
+        
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
