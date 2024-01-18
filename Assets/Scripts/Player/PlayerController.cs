@@ -1,4 +1,5 @@
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviourPunCallbacks
@@ -12,18 +13,25 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     public float BulletSpeed = 100f;
 
-    public PlayerTyp PlayerTyp;
+    public PlayerTyp PlayerTyp = PlayerTyp.STUDENT;
 
     public PlayerCam PlayerCameraController;
 
     private ParticleSystem _particleSystem;
-
+    public TMP_Text nameTag;
+    
     public bool canShoot = true;
 
     void Awake()
     {
         _particleSystem = shootPoint.gameObject.GetComponentInChildren<ParticleSystem>();
-        PlayerTyp = PhotonNetwork.IsMasterClient ? PlayerTyp.TEACHER : PlayerTyp.STUDENT;
+
+        if (photonView.IsMine && PhotonNetwork.IsMasterClient)
+        {
+            PlayerTyp = PlayerTyp.TEACHER;
+        }
+        
+        nameTag.text = photonView.Owner.NickName;
     }
 
     // Update is called once per frame
