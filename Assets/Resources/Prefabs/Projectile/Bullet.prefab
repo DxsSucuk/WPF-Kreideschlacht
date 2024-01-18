@@ -160,7 +160,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: b5387d3c2ba98fc44a0f5744f94ce48c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -190,22 +190,22 @@ TrailRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 0.26282126
-        inSlope: -0.0851527
-        outSlope: -0.0851527
+        time: 0.0017127991
+        value: 0.08635336
+        inSlope: -0.26789305
+        outSlope: -0.26789305
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.42397678
+        outWeight: 0.25193977
       - serializedVersion: 3
         time: 0.35513306
         value: 0
-        inSlope: -2.1728373
-        outSlope: -2.1728373
+        inSlope: -0.25561377
+        outSlope: -0.25561377
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.07714293
+        inWeight: 0.24417809
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
@@ -281,7 +281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 0
+  m_SynchronizeAngularVelocity: 1
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
 --- !u!114 &8887856320020777698
@@ -320,7 +320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62f30c0cbec749dd88dc486e2e3308da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageValue: 50
+  damageValue: 15
 --- !u!1001 &8078829136753492430
 PrefabInstance:
   m_ObjectHideFlags: 0

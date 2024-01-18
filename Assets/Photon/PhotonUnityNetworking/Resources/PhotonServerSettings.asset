@@ -43,6 +43,9 @@ MonoBehaviour:
   - Player_Heal
   - Throw
   - Weapon_Shoot
+  - ThrowRPC
+  - ResetInfo
+  - PickupRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
-  DevRegionSetOnce: 0
+  DevRegionSetOnce: 1

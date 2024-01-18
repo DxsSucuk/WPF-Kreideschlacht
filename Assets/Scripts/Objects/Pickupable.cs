@@ -1,18 +1,25 @@
 ﻿using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(PhotonTransformView))]
+[RequireComponent(typeof(PhotonView))]
+[RequireComponent(typeof(Collider))]
 public class Pickupable : MonoBehaviourPun
 {
     public GameObject crosshair1, crosshair2;
     public Transform cameraTrans;
     public bool interactable, pickedup;
     private Rigidbody objRigidbody;
-    public float throwAmount;
+    public float throwAmount = 500;
     public PlayerController controller;
+    private ObjectAction lastAction;
 
     private void Awake()
     {
         objRigidbody = GetComponent<Rigidbody>();
+        photonView.OwnershipTransfer = OwnershipOption.Request;
     }
 
     void OnTriggerStay(Collider other)
@@ -24,6 +31,7 @@ public class Pickupable : MonoBehaviourPun
             interactable = true;
             cameraTrans = other.transform;
             controller = cameraTrans.parent.GetComponent<PlayerController>();
+            controller.canShoot = false;
         }
     }
 
@@ -36,11 +44,13 @@ public class Pickupable : MonoBehaviourPun
                 crosshair1.SetActive(true);
                 crosshair2.SetActive(false);
                 interactable = false;
+                controller.canShoot = true;
             }
             else
             {
                 crosshair1.SetActive(true);
                 crosshair2.SetActive(false);
+                controller.canShoot = true;
             }
         }
     }
@@ -51,14 +61,14 @@ public class Pickupable : MonoBehaviourPun
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                //Pickup();
-                photonView.RPC(nameof(Pickup), RpcTarget.All, controller.photonView.ViewID);
+                lastAction = ObjectAction.PICKUP;
+                Pickup();
             }
 
             if (Input.GetKeyUp(KeyCode.E))
             {
-                //Drop();
-                photonView.RPC(nameof(Drop), RpcTarget.All/*, controller.photonView.ViewID*/);
+                lastAction = ObjectAction.DROP;
+                Drop();
             }
         }
         
@@ -66,14 +76,28 @@ public class Pickupable : MonoBehaviourPun
         {
             if (Input.GetMouseButtonDown(1))
             {
-                //Throw();
-                photonView.RPC(nameof(Throw), RpcTarget.All, controller.photonView.ViewID);
+                lastAction = ObjectAction.THROW;
+                Throw();
             }
+        }
+    }
+
+    void Pickup()
+    {
+        if (photonView.IsMine)
+        {
+            Debug.Log("Sending Pickup.");
+            photonView.RPC(nameof(PickupRPC), RpcTarget.All, controller.photonView.ViewID);
+        }
+        else
+        {
+            Debug.Log("Requesting Ownership.");
+            photonView.RequestOwnership();
         }
     }
     
     [PunRPC]
-    void Pickup(int viewId)
+    void PickupRPC(int viewId)
     {
         transform.parent = PhotonNetwork.GetPhotonView(viewId).transform.GetChild(0).transform;
         objRigidbody.useGravity = false;
@@ -82,22 +106,90 @@ public class Pickupable : MonoBehaviourPun
         objRigidbody.constraints = RigidbodyConstraints.FreezeAll;
     }
     
-    [PunRPC]
     void Drop()
     {
-        transform.parent = null;
-        objRigidbody.useGravity = true;
-        pickedup = false;
-        objRigidbody.constraints = RigidbodyConstraints.None;
+        if (photonView.IsMine)
+        {
+            Debug.Log("Sending Drop.");
+            photonView.RPC(nameof(ResetInfo), RpcTarget.All);
+        }
+        else
+        {
+            Debug.Log("Requesting Ownership Drop.");
+            photonView.RequestOwnership();
+        }
+        
     }
 
+    void Throw()
+    {
+        if (photonView.IsMine)
+        {
+            Debug.Log("Sending Throw.");
+            ThrowObject();
+        }
+        else
+        {
+            Debug.Log("Requesting Ownership Throw.");
+            photonView.RequestOwnership();
+        }
+    }
+
+    public void OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
+    {
+        if (!pickedup)
+        {
+            Debug.Log("Transfer Ownership.");
+            targetView.TransferOwnership(requestingPlayer);
+        }
+        else
+        {
+            Debug.Log("Is pickedup.");
+        }
+    }
+
+    public void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
+    {
+        Debug.Log("Accept Transfered.");
+        switch (lastAction)
+        {
+            case ObjectAction.THROW:
+            {
+                ThrowObject();
+                break;
+            }
+
+            case ObjectAction.PICKUP:
+            {
+                photonView.RPC(nameof(PickupRPC), RpcTarget.All, controller.photonView.ViewID);
+                break;
+            }
+
+            case ObjectAction.DROP:
+            {
+                photonView.RPC(nameof(ResetInfo), RpcTarget.All);
+                break;
+            }
+        }
+    }
+
+    public void OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)
+    {
+        Debug.Log("Failed Takeover");
+    }
+
+    void ThrowObject()
+    {
+        photonView.RPC(nameof(ResetInfo), RpcTarget.All);
+        objRigidbody.velocity = controller.orientation.forward * throwAmount * Time.deltaTime;
+    }
+    
     [PunRPC]
-    void Throw(int viewId)
+    void ResetInfo()
     {
         transform.parent = null;
         objRigidbody.useGravity = true;
         objRigidbody.constraints = RigidbodyConstraints.None;
         pickedup = false;
-        objRigidbody.velocity = PhotonNetwork.GetPhotonView(viewId).transform.GetChild(0).transform.forward * throwAmount * Time.deltaTime;
     }
 }

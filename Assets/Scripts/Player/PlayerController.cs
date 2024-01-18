@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private ParticleSystem _particleSystem;
 
-    private bool canShoot = true;
+    public bool canShoot = true;
 
     void Awake()
     {

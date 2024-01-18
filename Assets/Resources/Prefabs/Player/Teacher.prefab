@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5572817905919865827}
+  - component: {fileID: 3028610773661101084}
   m_Layer: 0
   m_Name: Orientation
   m_TagString: Untagged
@@ -31,6 +32,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 551130967120238388}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3028610773661101084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2016325753954793954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 0
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &2078138026303682304
 GameObject:
   m_ObjectHideFlags: 0
@@ -44,6 +61,7 @@ GameObject:
   - component: {fileID: 2828563290013937284}
   - component: {fileID: 9058261572049124318}
   - component: {fileID: 5683033121476533943}
+  - component: {fileID: 6214463132819021602}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -144,8 +162,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.2, y: 0.2, z: 0.81953406}
-  m_Center: {x: 0, y: 0, z: 0.6402329}
+  m_Size: {x: 0.2, y: 0.2, z: 1.4196358}
+  m_Center: {x: 0, y: 0, z: 0.9402838}
 --- !u!114 &5683033121476533943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,6 +176,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 728a57b9e6054ee09657732135859862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  disableSelf: 0
+  disableComponents:
+  - {fileID: 2325567975551813439}
+  - {fileID: 2828563290013937284}
+--- !u!114 &6214463132819021602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078138026303682304}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 0
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &3786641456220239112
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,7 +331,7 @@ MonoBehaviour:
   speedIncreaseMultiplier: 1.5
   slopeIncreaseMultiplier: 2.5
   groundDrag: 4
-  jumpForce: 3
+  jumpForce: 5
   jumpCooldown: 0.25
   airMultiplier: 1
   crouchSpeed: 4
@@ -304,7 +342,7 @@ MonoBehaviour:
   playerHeight: 2
   whatIsGround:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 9
   maxSlopeAngle: 75
   orientation: {fileID: 5572817905919865827}
   state: 0
@@ -374,9 +412,10 @@ MonoBehaviour:
   shootPoint: {fileID: 3495954572839540977}
   orientation: {fileID: 5572817905919865827}
   bullet: {fileID: 4324326621529309522, guid: 854e7021445d2204dbd630e616412c39, type: 3}
-  BulletSpeed: 100
+  BulletSpeed: 50
   PlayerTyp: 0
   PlayerCameraController: {fileID: 1794068503293648871}
+  canShoot: 1
 --- !u!114 &544806972732414975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,6 +452,8 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 544806972732414975}
+  - {fileID: 6214463132819021602}
+  - {fileID: 3028610773661101084}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

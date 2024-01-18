@@ -5,11 +5,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
+public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwnershipCallbacks
 {
     public Slider _healthSlider;
     public TextMeshProUGUI _speed;
     public TextMeshProUGUI _mode;
+    public GameObject crosshair, crosshairInactive;
     public PlayerController _playerController;
     public PlayerCam _playerCameraController;
     public PlayerMovementAdvanced _playerMovementController;
@@ -39,6 +40,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             if (!PhotonNetwork.InRoom && PhotonNetwork.IsConnectedAndReady)
                 PhotonNetwork.JoinRandomOrCreateRoom(null, 0, Photon.Realtime.MatchmakingMode.RandomMatching, null, null, RandomString(4));
         }
+
+        Pickupable[] list = FindObjectsOfType<Pickupable>();
+
+        if (list != null && list.Length > 0)
+        {
+            foreach (var pickupable in list)
+            {
+                pickupable.crosshair1 = crosshairInactive;
+                pickupable.crosshair2 = crosshair;
+            }
+        }
     }
 
     private void Start()
@@ -54,7 +66,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (_playerController == null) return;
         
         Check_Health();
-        Check_Dash();
     }
 
     void Check_Health()
@@ -68,10 +79,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             _healthSlider.gameObject.SetActive(true);
         }
-    }
-
-    void Check_Dash()
-    {
     }
 
     public void damage(PlayerController playerController, float damage)
@@ -130,5 +137,32 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         return new string(Enumerable.Repeat(chars, length)
             .Select(s => s[new System.Random().Next(s.Length)]).ToArray());
+    }
+    
+    void IPunOwnershipCallbacks.OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
+    {
+        Debug.Log("Transfer Ownership GM.");
+        if (targetView.TryGetComponent(out Pickupable pickupable))
+        {
+            pickupable.OnOwnershipRequest(targetView, requestingPlayer);
+        }
+    }
+
+    void IPunOwnershipCallbacks.OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
+    {
+        Debug.Log("Accept Transfered GM.");
+        if (targetView.TryGetComponent(out Pickupable pickupable))
+        {
+            pickupable.OnOwnershipTransfered(targetView, previousOwner);
+        }
+    }
+
+    void IPunOwnershipCallbacks.OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)
+    {
+        Debug.Log("Failed Takeover GM.");
+        if (targetView.TryGetComponent(out Pickupable pickupable))
+        {
+            pickupable.OnOwnershipTransferFailed(targetView, senderOfFailedRequest);
+        }
     }
 }
