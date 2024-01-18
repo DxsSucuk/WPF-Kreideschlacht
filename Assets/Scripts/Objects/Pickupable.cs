@@ -154,6 +154,18 @@ public class Pickupable : MonoBehaviourPun
     public void OnOwnershipTransfered(PhotonView targetView, Player previousOwner)
     {
         Debug.Log("Accept Transfered.");
+        if (controller is null)
+        {
+            Debug.Log("NULL CONTROLLER CAREFUL!");
+            return;
+        }
+
+        if (photonView is null)
+        {
+            Debug.Log("No PhotonView?");
+            return;
+        }
+        
         switch (lastAction)
         {
             case ObjectAction.THROW:
