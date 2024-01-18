@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
@@ -18,9 +19,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
     public GameObject playerUI, gameUI;
     public GameObject preGameCamera;
 
+    public GameObject playerList;
+    public GameObject defaultEntry;
+
+    public TMP_Text status;
+    public GameObject startButton;
+
     private void Awake()
     {
-        PhotonNetwork.NickName = RandomString(8);
+        PhotonNetwork.NetworkingClient.AddCallbackTarget(this);
+        PhotonNetwork.NickName = PlayerPrefs.GetString("username",RandomString(8));
         if (!PhotonNetwork.IsConnected || !PhotonNetwork.InRoom)
         {
             if (!PhotonNetwork.IsConnected)
@@ -29,6 +37,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
             if (!PhotonNetwork.InRoom && PhotonNetwork.IsConnectedAndReady)
                 PhotonNetwork.JoinRandomOrCreateRoom(null, 0, Photon.Realtime.MatchmakingMode.RandomMatching, null,
                     null, RandomString(4));
+        }
+        
+        if (PhotonNetwork.InRoom)
+        {
+            updatePlayerList();
         }
 
         Pickupable[] list = FindObjectsOfType<Pickupable>();
@@ -41,6 +54,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
                 pickupable.crosshair2 = crosshair;
             }
         }
+    }
+
+    public override void OnEnable()
+    {
+        PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
+    }
+
+    public override void OnDisable()
+    {
+        PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
     }
 
     private void Start()
@@ -80,6 +103,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
     public override void OnConnectedToMaster()
     {
         Debug.Log("Connected to Master!");
+        
         if (!PhotonNetwork.InRoom)
             PhotonNetwork.JoinRandomOrCreateRoom(null, 0, Photon.Realtime.MatchmakingMode.FillRoom, null, null,
                 RandomString(4));
@@ -88,12 +112,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room!");
+        updatePlayerList();
     }
 
     public void SpawnPlayer()
     {
         if (PhotonNetwork.GetPhotonView(PhotonNetwork.SyncViewId) == null)
         {
+            gameUI.SetActive(false);
+            playerUI.SetActive(true);
             preGameCamera.SetActive(false);
             GameObject player = PhotonNetwork
                 .Instantiate("Prefabs/Player/Teacher", GameObject.FindWithTag("Respawn").transform.position,
@@ -115,16 +142,41 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        base.OnPlayerEnteredRoom(newPlayer);
         Debug.Log(newPlayer.NickName + " joined!");
+        base.OnPlayerEnteredRoom(newPlayer);
+        updatePlayerList();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        base.OnPlayerLeftRoom(otherPlayer);
         Debug.Log(otherPlayer.NickName + " left!");
+        base.OnPlayerLeftRoom(otherPlayer);
+        updatePlayerList();
     }
 
+    public void updatePlayerList()
+    {
+        foreach (LayoutElement layoutElement in playerList.GetComponentsInChildren<LayoutElement>())
+        {
+            if (layoutElement.isActiveAndEnabled)
+            {
+                Destroy(layoutElement.gameObject);
+            }
+        }
+
+        foreach (var player in PhotonNetwork.PlayerList)
+        {
+            GameObject newEntry = Instantiate(defaultEntry, playerList.transform);
+            newEntry.GetComponentInChildren<TMP_Text>().text = player.NickName;
+            newEntry.SetActive(true);
+        }
+
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.PlayerList.Length >= 2)
+        {
+            startButton.SetActive(true);
+            UpdateState("Ready");
+        }
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -163,10 +215,35 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
             pickupable.OnOwnershipTransferFailed(targetView, senderOfFailedRequest);
         }
     }
-    
-    [PunRPC]
-    void StartMatch()
+
+    public void StartMatch()
     {
-        SpawnPlayer();
+        if (!PhotonNetwork.IsMasterClient) return;
+        
+        PhotonNetwork.RaiseEvent(EventList.START_EVENT, null, new RaiseEventOptions
+        {
+            Receivers = ReceiverGroup.All
+        }, SendOptions.SendReliable);
+    }
+
+    void OnEvent(EventData photonEvent)
+    {
+        byte eventCode = photonEvent.Code;
+
+        if (eventCode == EventList.START_EVENT)
+        {
+            SpawnPlayer();
+        } else if (eventCode == EventList.STATE_UPDATE_EVENT)
+        {
+            status.text = photonEvent.CustomData as string;
+        }
+    }
+    
+    void UpdateState(string state)
+    {
+        PhotonNetwork.RaiseEvent(EventList.STATE_UPDATE_EVENT, state, new RaiseEventOptions
+        {
+            Receivers = ReceiverGroup.All
+        }, SendOptions.SendReliable);
     }
 }

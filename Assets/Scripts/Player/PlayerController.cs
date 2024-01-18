@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     void Awake()
     {
         _particleSystem = shootPoint.gameObject.GetComponentInChildren<ParticleSystem>();
+        PlayerTyp = PhotonNetwork.IsMasterClient ? PlayerTyp.TEACHER : PlayerTyp.STUDENT;
     }
 
     // Update is called once per frame
@@ -46,7 +47,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     void Weapon_Shoot()
     {
         if (_particleSystem != null) _particleSystem.Play();
-        
+
         if (photonView.IsMine)
         {
             if (!canShoot) return;
@@ -91,7 +92,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         health = health + heal > maxHealth ? maxHealth : health + heal;
     }
-    
+
     [PunRPC]
     public void Player_Damage(float damage)
     {
@@ -99,14 +100,14 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if (health <= 0)
         {
             health = 0;
-            
+
             if (photonView.IsMine)
             {
                 photonView.RPC(nameof(Player_Death), RpcTarget.All);
             }
         }
     }
-    
+
     [PunRPC]
     void Player_Death()
     {
@@ -115,8 +116,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.Instantiate("Prefabs/Player/Player_Corpse", gameObject.transform.position,
                 Quaternion.identity);
-                transform.position += new Vector3(0, 5, 0);
-                photonView.RPC(nameof(Player_Heal), RpcTarget.All, 99999f);
+            transform.position = GameObject.FindWithTag("Respawn").transform.position;
+            photonView.RPC(nameof(Player_Heal), RpcTarget.All, 99999f);
         }
     }
 }
