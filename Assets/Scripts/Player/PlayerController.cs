@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         _particleSystem = shootPoint.gameObject.GetComponentInChildren<ParticleSystem>();
 
-        if (photonView.IsMine && PhotonNetwork.IsMasterClient)
+        if (photonView.Owner.IsMasterClient)
         {
             PlayerTyp = PlayerTyp.TEACHER;
         }
@@ -124,7 +124,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.Instantiate("Prefabs/Player/Player_Corpse", gameObject.transform.position,
                 Quaternion.identity);
-            transform.position = GameObject.FindWithTag("Respawn").transform.position;
+
+            if (PlayerTyp == PlayerTyp.STUDENT)
+            {
+                transform.position = GameObject.FindWithTag("Deadspawn").transform.position;
+            }
+            else
+            {
+                transform.position = GameObject.FindWithTag("Respawn").transform.position;
+            }
+
             photonView.RPC(nameof(Player_Heal), RpcTarget.All, 99999f);
         }
     }
