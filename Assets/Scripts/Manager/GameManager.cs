@@ -15,30 +15,20 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
     public PlayerCam _playerCameraController;
     public PlayerMovementAdvanced _playerMovementController;
 
+    public GameObject playerUI, gameUI;
+    public GameObject preGameCamera;
+
     private void Awake()
     {
         PhotonNetwork.NickName = RandomString(8);
-        if (PhotonNetwork.IsConnected && PhotonNetwork.InRoom)
+        if (!PhotonNetwork.IsConnected || !PhotonNetwork.InRoom)
         {
-            if (PhotonNetwork.GetPhotonView(PhotonNetwork.SyncViewId) == null)
-            {
-                _playerController = PhotonNetwork
-                    .Instantiate("Prefabs/Player/Teacher", GameObject.FindWithTag("Respawn").transform.position, Quaternion.identity)
-                    .GetComponent<PlayerController>();
-                _healthSlider.maxValue = _playerController.maxHealth;
-                
-                PlayerMovementAdvanced movement = _playerController.GetComponent<PlayerMovementAdvanced>();
-                movement.text_mode = _mode;
-                movement.text_speed = _speed;
-            }
-        }
-        else
-        {
-            if (!PhotonNetwork.IsConnected) 
+            if (!PhotonNetwork.IsConnected)
                 PhotonNetwork.ConnectUsingSettings();
-            
+
             if (!PhotonNetwork.InRoom && PhotonNetwork.IsConnectedAndReady)
-                PhotonNetwork.JoinRandomOrCreateRoom(null, 0, Photon.Realtime.MatchmakingMode.RandomMatching, null, null, RandomString(4));
+                PhotonNetwork.JoinRandomOrCreateRoom(null, 0, Photon.Realtime.MatchmakingMode.RandomMatching, null,
+                    null, RandomString(4));
         }
 
         Pickupable[] list = FindObjectsOfType<Pickupable>();
@@ -64,7 +54,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
     private void Update()
     {
         if (_playerController == null) return;
-        
+
         Check_Health();
     }
 
@@ -87,34 +77,42 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
         Debug.Log("Damage dealt to " + playerController.photonView.Owner.NickName + "! " + damage);
     }
 
-    public override void OnConnectedToMaster() {
+    public override void OnConnectedToMaster()
+    {
         Debug.Log("Connected to Master!");
         if (!PhotonNetwork.InRoom)
-            PhotonNetwork.JoinRandomOrCreateRoom(null, 0, Photon.Realtime.MatchmakingMode.FillRoom, null, null, RandomString(4));
+            PhotonNetwork.JoinRandomOrCreateRoom(null, 0, Photon.Realtime.MatchmakingMode.FillRoom, null, null,
+                RandomString(4));
     }
-    
+
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room!");
+    }
+
+    public void SpawnPlayer()
+    {
         if (PhotonNetwork.GetPhotonView(PhotonNetwork.SyncViewId) == null)
         {
+            preGameCamera.SetActive(false);
             GameObject player = PhotonNetwork
-                .Instantiate("Prefabs/Player/Teacher", GameObject.FindWithTag("Respawn").transform.position, Quaternion.identity);
+                .Instantiate("Prefabs/Player/Teacher", GameObject.FindWithTag("Respawn").transform.position,
+                    Quaternion.identity);
 
             _playerController = player.GetComponent<PlayerController>();
             _playerMovementController = player.GetComponent<PlayerMovementAdvanced>();
             _playerCameraController = player.GetComponent<PlayerCam>();
-            
+
             //_playerCameraController.orientation = _playerController.orientation;
             _playerController.PlayerCameraController = _playerCameraController;
 
             _healthSlider.maxValue = _playerController.maxHealth;
-            
+
             _playerMovementController.text_mode = _mode;
             _playerMovementController.text_speed = _speed;
         }
     }
-    
+
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         base.OnPlayerEnteredRoom(newPlayer);
@@ -127,18 +125,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
         Debug.Log(otherPlayer.NickName + " left!");
     }
 
-    
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
     }
-    
+
     string RandomString(int length)
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         return new string(Enumerable.Repeat(chars, length)
             .Select(s => s[new System.Random().Next(s.Length)]).ToArray());
     }
-    
+
     void IPunOwnershipCallbacks.OnOwnershipRequest(PhotonView targetView, Player requestingPlayer)
     {
         Debug.Log("Transfer Ownership GM.");
@@ -164,5 +162,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
         {
             pickupable.OnOwnershipTransferFailed(targetView, senderOfFailedRequest);
         }
+    }
+    
+    [PunRPC]
+    void StartMatch()
+    {
+        SpawnPlayer();
     }
 }
