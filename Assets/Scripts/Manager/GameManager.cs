@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -6,7 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwnershipCallbacks
+public class GameManager : MonoBehaviourPunCallbacks, IPunOwnershipCallbacks
 {
     public Slider _healthSlider;
     public TextMeshProUGUI _speed;
@@ -27,7 +28,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
 
     private void Awake()
     {
-        PhotonNetwork.NetworkingClient.AddCallbackTarget(this);
         PhotonNetwork.NickName = PlayerPrefs.GetString("username",RandomString(8));
         if (!PhotonNetwork.IsConnected || !PhotonNetwork.InRoom)
         {
@@ -58,11 +58,13 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
 
     public override void OnEnable()
     {
+        base.OnEnable();
         PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
     }
 
     public override void OnDisable()
     {
+        base.OnDisable();
         PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
     }
 
@@ -176,10 +178,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable, IPunOwners
             startButton.SetActive(true);
             UpdateState("Ready");
         }
-    }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
     }
 
     string RandomString(int length)

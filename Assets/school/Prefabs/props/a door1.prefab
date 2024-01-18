@@ -262,8 +262,8 @@ HingeJoint:
   serializedVersion: 2
   m_UseSpring: 1
   m_Spring:
-    spring: 2
-    damper: 1
+    spring: 1
+    damper: 0
     targetPosition: 0
   m_UseMotor: 0
   m_Motor:
@@ -453,8 +453,8 @@ HingeJoint:
   serializedVersion: 2
   m_UseSpring: 1
   m_Spring:
-    spring: 2
-    damper: 1
+    spring: 1
+    damper: 0
     targetPosition: 0
   m_UseMotor: 0
   m_Motor:
@@ -472,7 +472,7 @@ HingeJoint:
     contactDistance: 0
   m_BreakForce: 1000
   m_BreakTorque: Infinity
-  m_EnableCollision: 0
+  m_EnableCollision: 1
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1

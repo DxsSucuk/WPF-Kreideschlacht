@@ -193,5 +193,5 @@ MonoBehaviour:
   cameraTrans: {fileID: 0}
   interactable: 0
   pickedup: 0
-  throwAmount: 1200
+  throwAmount: 700
   controller: {fileID: 0}

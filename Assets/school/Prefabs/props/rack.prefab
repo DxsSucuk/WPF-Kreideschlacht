@@ -194,7 +194,7 @@ MonoBehaviour:
   cameraTrans: {fileID: 0}
   interactable: 0
   pickedup: 0
-  throwAmount: 1200
+  throwAmount: 650
   controller: {fileID: 0}
 --- !u!65 &5320005878395711763
 BoxCollider:

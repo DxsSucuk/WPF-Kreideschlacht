@@ -139,8 +139,11 @@ public class Pickupable : MonoBehaviourPun
     {
         if (!pickedup)
         {
-            Debug.Log("Transfer Ownership.");
-            targetView.TransferOwnership(requestingPlayer);
+            if (photonView.IsMine)
+            {
+                Debug.Log("Transfer Ownership.");
+                targetView.TransferOwnership(requestingPlayer);
+            }
         }
         else
         {
